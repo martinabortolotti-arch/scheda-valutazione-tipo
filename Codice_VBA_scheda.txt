@@ -1,0 +1,51 @@
+Sub CreaScheda()
+Dim w As Worksheet,a,i,r,j
+Set w=Workbooks.Add(xlWBATWorksheet).Worksheets(1)
+With w
+.Name="Scheda di valutazione"
+a=Split("Dati identificativi|Codice scheda|Nome commerciale|Azienda produttrice|Tipo prodotto|Materiale|Impiego previsto nel progetto","|")
+For i=0 To 6:.Cells(i+4,2)=a(i):Next
+.Range("C4")="Informazioni"
+a=Split("Parametro|Caratteristiche|Valutazione 1-5|Ponderazione 1-3|Somma","|")
+For i=0 To 4:.Cells(13,i+2)=a(i):Next
+a=Split("Materiali costituenti|Origine dei componenti|Derivazione dei componenti||Provenienza della materia prima|Localizzazione produzione|Distanza di trasporto||Posa e assemblaggio|Disassemblaggio|Separabilita|Fine vita","|")
+For i=1 To 5:.Cells(i,8)=i:Next
+.Columns(8).Hidden=True
+For i=0 To 11
+r=i+14
+If a(i)<>"" Then
+.Cells(r,2)=a(i)
+.Range(.Cells(r,2),.Cells(r,6)).Borders(9).LineStyle=1
+.Range(.Cells(r,3),.Cells(r,5)).Interior.Color=RGB(233,239,231)
+.Cells(r,6).Interior.Color=RGB(230,230,230)
+For j=4 To 5
+With .Cells(r,j).Validation
+.Add 3,1,1,"=$H$1:$H$" & IIf(j=4,5,3)
+.InCellDropdown=True
+.IgnoreBlank=True
+.ShowError=True
+End With
+Next
+.Cells(r,6).FormulaR1C1="=IF(COUNT(RC[-2]:RC[-1])<2,"""",RC[-2]*RC[-1])"
+End If
+Next
+.Range("B27:E27").Merge
+.Range("B27")="Valutazione finale"
+.Range("F27").Formula="=IF(COUNT(F14:F25)=0,"""",SUM(F14:F25))"
+.Range("E4:F10").Merge
+.Range("E4")="Compilare le celle verdi. Valutazione: 1=poco sostenibile, 5=molto sostenibile. Ponderazione: 1=importanza bassa, 2=media, 3=alta. Scegliere dalle tendine. Le celle grigie si calcolano automaticamente."
+.Columns("B:C").ColumnWidth=28
+.Columns("D:F").ColumnWidth=17
+.Range("B4:F27").WrapText=True
+.Range("B4:F27").Font.Name="Arial"
+.Range("B4:F27").Font.Size=11
+.Range("B4:F27").VerticalAlignment=xlCenter
+.Rows("4:27").RowHeight=36
+.Range("B4:C4,B13:F13,B27:F27").Font.Bold=True
+.Range("C5:C10").Interior.Color=RGB(233,239,231)
+.Range("C5:C10,C14:C25").NumberFormat="@"
+.Range("D14:F25,F27").HorizontalAlignment=xlCenter
+.Range("F27").Interior.Color=RGB(230,230,230)
+.Calculate
+End With
+End Sub
